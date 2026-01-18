@@ -375,8 +375,8 @@ void Render() {
     // ´ë°¢¼± À§¿¡¼­ ²ÈÈ÷´Â ºû: (1, -1, 1) °°Àº ´À³¦
     cb.vLightDir = XMFLOAT4(0.5f, -1.0f, 1.0f, 0.0f); // ºûÀÌ ¾Æ·¡·Î(-y) ²ÈÈû
 
-    // ºûÀÇ »ö»ó: Èò»ö ºû
-    cb.vLightColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    // ºûÀÇ »ö»ó: ¿¶Àº ³ë¶õ»ö ºû
+    cb.vLightColor = XMFLOAT4(1.0f, 0.9f, 0.8f, 1.0f);
 
     // ÄÁÅØ½ºÆ®¸¦ ÀÌ¿ëÇØ GPU ¸Þ¸ð¸® °»½Å
     g_pImmediateContext->UpdateSubresource(g_pConstantBuffer.Get(), 0, nullptr, &cb, 0, 0);
