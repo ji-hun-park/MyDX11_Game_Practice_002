@@ -60,10 +60,13 @@ PS_INPUT VS(VS_INPUT input)
     output.Pos = pos;
     
     // 기존: 색상 그대로 넘김 output.Color = input.Color;
-    // 2. 법선 벡터 변환 (중요!)
+    // 법선 벡터 변환 (중요!)
     // 물체가 회전하면 법선도 같이 회전해야 합니다.
     // (World 행렬의 회전 성분만 적용)
     output.Normal = mul(input.Normal, (float3x3) World);
+    
+    // UV 좌표 변환 없이 그대로 넘김
+    output.Tex = input.Tex;
     
     return output;
 }
@@ -88,9 +91,18 @@ float4 PS(PS_INPUT input) : SV_Target
     // saturate: 0.0 ~ 1.0 사이로 자름 (음수가 나오면 검은색 처리)
     float diffuseFactor = saturate(dot(normal, lightDir));
     
+    // B. 텍스처 색상 추출 (Sampling)
+    // txDiffuse 텍스처에서, samLinear 도구를 써서, input.Tex 좌표의 색을 가져와라.
+    float4 textureColor = txDiffuse.Sample(samLinear, input.Tex);
+    
+    // C. 최종 색상 = (조명 * 빛색상 + 환경광) * 텍스처 색상
+    // 텍스처 색에 조명을 곱해줍니다.
+    float4 lightResult = (diffuseFactor * vLightColor) + float4(0.2f, 0.2f, 0.2f, 1.0f);
+    
     // 4. 최종 색상 = 조명 밝기 * 빛의 색상
     // (물체 고유색이 있다면 여기서 곱해줍니다. 지금은 흰색 물체라 가정)
     // 기존: return diffuseFactor * vLightColor;
     // 주변광(Ambient) 추가
-    return (diffuseFactor * vLightColor) + float4(0.1f, 0.1f, 0.1f, 1.0f);
+    // 기존2: return (diffuseFactor * vLightColor) + float4(0.1f, 0.1f, 0.1f, 1.0f);
+    return lightResult * textureColor;
 }
