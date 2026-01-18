@@ -22,6 +22,7 @@ struct VS_INPUT
     float4 Pos : POSITION;  // 정점 위치 (x, y, z, 1.0)
     // float4 Color : COLOR; 기존 정점 색상 (r, g, b, a)
     float3 Normal : NORMAL; // 색상 대신 법선 벡터를 받음 (x, y, z)
+    float2 Tex : TEXCOORD0; // UV 좌표 추가 (u, v)
 };
 
 // 2. 버텍스 셰이더와 픽셀 셰이더 사이의 통신 구조체
@@ -30,6 +31,7 @@ struct PS_INPUT
     float4 Pos : SV_POSITION;  // 중요: 화면상 좌표 (System Value)
     // float4 Color : COLOR; 색상
     float3 Normal : TEXCOORD0; // 픽셀 셰이더로 법선을 넘겨줌
+    float2 Tex : TEXCOORD1; // UV 좌표 전달
 };
 
 // --------------------------------------------------------
