@@ -105,20 +105,42 @@ HRESULT InitD3D(HWND hWnd) {
     if (FAILED(hr)) return hr;
 
     // 3. 렌더 타겟 뷰(RTV) 생성
-    // 스왑 체인에서 백 버퍼(그림 그릴 종이)를 가져옵니다.
+    // A. 스왑 체인에서 백 버퍼(그림 그릴 종이)를 가져옵니다.
     ComPtr<ID3D11Texture2D> pBackBuffer;
     hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)pBackBuffer.GetAddressOf());
     if (FAILED(hr)) return hr;
 
-    // 가져온 백 버퍼를 타겟으로 뷰를 만듭니다.
+    // B. 가져온 백 버퍼를 타겟으로 뷰를 만듭니다.
     hr = g_pd3dDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, g_pRenderTargetView.GetAddressOf());
     if (FAILED(hr)) return hr;
 
-    // 4. 렌더 타겟 설정 (Output Merger 단계)
-    // "이제부터 이 도화지(RTV)에 그릴 거야"라고 작업자(Context)에게 지시
-    g_pImmediateContext->OMSetRenderTargets(1, g_pRenderTargetView.GetAddressOf(), nullptr);
+    // 4. 깊이 버퍼 텍스처 생성
+    D3D11_TEXTURE2D_DESC descDepth = { 0 };
+    descDepth.Width = 800;
+    descDepth.Height = 600;
+    descDepth.MipLevels = 1;
+    descDepth.ArraySize = 1;
+    descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // 24비트 Depth + 8비트 Stencil
+    descDepth.SampleDesc.Count = 1;
+    descDepth.Usage = D3D11_USAGE_DEFAULT;
+    descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;  // "이것은 깊이 버퍼다"
+    descDepth.CPUAccessFlags = 0;
+    descDepth.MiscFlags = 0;
 
-    // 5. 뷰포트(Viewport) 설정 (Rasterizer 단계)
+    hr = g_pd3dDevice->CreateTexture2D(&descDepth, nullptr, g_pDepthStencilBuffer.GetAddressOf());
+    if (FAILED(hr)) return hr;
+
+    // 5. 깊이 버퍼 뷰(DSV) 생성
+    hr = g_pd3dDevice->CreateDepthStencilView(g_pDepthStencilBuffer.Get(), nullptr, g_pDepthStencilView.GetAddressOf());
+    if (FAILED(hr)) return hr;
+
+    // 6. 렌더 타겟 설정 (Output Merger 단계)
+    // "이제부터 이 도화지(RTV)에 그릴 거야"라고 작업자(Context)에게 지시
+    // 기존: g_pImmediateContext->OMSetRenderTargets(1, g_pRenderTargetView.GetAddressOf(), nullptr);
+    // 변경: 렌더 타겟(색상)과 뎁스 스텐실 뷰(깊이)를 같이 묶습니다.
+    g_pImmediateContext->OMSetRenderTargets(1, g_pRenderTargetView.GetAddressOf(), g_pDepthStencilView.Get());
+
+    // 7. 뷰포트(Viewport) 설정 (Rasterizer 단계)
     // 도화지의 어느 영역에 그릴지 설정 (전체 화면)
     D3D11_VIEWPORT vp;
     vp.Width = 800.0f;
