@@ -258,10 +258,10 @@ HRESULT InitPipeline() {
         { XMFLOAT3(1.0f,  1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
     };
 
-    // 버텍스 버퍼 생성 (기존 코드와 동일하지만 크기가 다름)
+    // 버텍스 버퍼 생성 (기존 코드에서 ByteWidth = sizeof(SimpleVertex) * 24 로 변경)
     D3D11_BUFFER_DESC bd = { 0 };
     bd.Usage = D3D11_USAGE_DEFAULT;
-    bd.ByteWidth = sizeof(SimpleVertex) * 8; // 점 8개
+    bd.ByteWidth = sizeof(SimpleVertex) * 24; // 점 24개
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.CPUAccessFlags = 0;
 
