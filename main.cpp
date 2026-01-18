@@ -179,6 +179,24 @@ HRESULT InitD3D(HWND hWnd) {
     // 만든 상태를 파이프라인에 적용
     g_pImmediateContext->RSSetState(g_pRasterizerState.Get());
 
+    // I. 텍스처 로드 (DirectXTK 사용)
+    // L"texture.jpg" 파일이 프로젝트 폴더(소스파일 있는 곳)에 있어야 합니다.
+    hr = CreateWICTextureFromFile(g_pd3dDevice.Get(), L"texture.jpg", nullptr, g_pTextureRV.GetAddressOf());
+    if (FAILED(hr)) return hr;
+
+    // II. 샘플러 상태 생성
+    D3D11_SAMPLER_DESC sampDesc = {};
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR; // 리니어 보간 (부드럽게)
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;    // 텍스처 범위를 넘어가면 반복(Wrap)
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sampDesc.MinLOD = 0;
+    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+    hr = g_pd3dDevice->CreateSamplerState(&sampDesc, g_pSamplerLinear.GetAddressOf());
+    if (FAILED(hr)) return hr;
+
     return S_OK;
 }
 
