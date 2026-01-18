@@ -191,9 +191,12 @@ HRESULT InitPipeline() {
         // 0: 오프셋 (구조체 시작부터 0바이트 지점)
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 
+		// COLOR -> NORMAL로 변경 (오프셋 12 유지)
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
         // "COLOR": HLSL의 시맨틱 이름
         // 12: 오프셋 (float3가 4byte * 3 = 12byte니까 그 다음부터 시작)
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        // { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
     UINT numElements = ARRAYSIZE(layout);
 
