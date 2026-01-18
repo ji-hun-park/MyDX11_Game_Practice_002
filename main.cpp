@@ -158,6 +158,18 @@ HRESULT InitD3D(HWND hWnd) {
     vp.TopLeftY = 0;
     g_pImmediateContext->RSSetViewports(1, &vp);
 
+    // 8. 래스터라이저 상태 설정 (Culling 끄기)
+    D3D11_RASTERIZER_DESC wfdesc = {};
+    wfdesc.FillMode = D3D11_FILL_SOLID; // 와이어프레임으로 보고 싶으면 D3D11_FILL_WIREFRAME
+    wfdesc.CullMode = D3D11_CULL_NONE;  // <--- 핵심! (기본값은 D3D11_CULL_BACK)
+    wfdesc.FrontCounterClockwise = FALSE;
+
+    hr = g_pd3dDevice->CreateRasterizerState(&wfdesc, g_pRasterizerState.GetAddressOf());
+    if (FAILED(hr)) return hr;
+
+    // 만든 상태를 파이프라인에 적용
+    g_pImmediateContext->RSSetState(g_pRasterizerState.Get());
+
     return S_OK;
 }
 
