@@ -251,7 +251,7 @@ HRESULT InitPipeline() {
     // 인덱스 버퍼 생성
     bd.Usage = D3D11_USAGE_DEFAULT;
     bd.ByteWidth = sizeof(WORD) * 36;        // 36개
-    bd.BindFlags = D3D11_BIND_INDEX_BUFFER; // "이것은 인덱스 버퍼다"
+    bd.BindFlags = D3D11_BIND_INDEX_BUFFER;  // "이것은 인덱스 버퍼다"
     bd.CPUAccessFlags = 0;
 
     InitData.pSysMem = indices;
@@ -287,13 +287,17 @@ HRESULT InitPipeline() {
 
 // 렌더링 함수
 void Render() {
-    // 0. 화면 지우기 (Clear)
+    // 0. 화면(색상) 지우기 (Clear)
     // RGBA (파란색 계열: Cornflower Blue)
     float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
     g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView.Get(), ClearColor);
 
+    // 깊이 버퍼 지우기 (매우 중요!)
+    // 매 프레임 깊이 정보를 1.0(가장 먼 값)으로 초기화해야 합니다.
+    g_pImmediateContext->ClearDepthStencilView(g_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
     // ---------------------------------------------------------
-    // 1. 애니메이션 로직 (Update)
+    // 2. 애니메이션 로직 (Update)
     // ---------------------------------------------------------
 
     // 시간을 이용해 회전 각도 계산 (GetTickCount64 사용)
@@ -307,7 +311,7 @@ void Render() {
 
 
     // ---------------------------------------------------------
-    // 2. GPU로 데이터 전송 (Update Subresource)
+    // 3. GPU로 데이터 전송 (Update Subresource)
     // ---------------------------------------------------------
     ConstantBuffer cb;
     // Transpose(전치)를 꼭 해줘야 HLSL이 올바르게 읽습니다!
@@ -322,7 +326,7 @@ void Render() {
 
 
     // ---------------------------------------------------------
-    // 3. 파이프라인 설정 및 그리기
+    // 4. 파이프라인 설정 및 그리기
     // ---------------------------------------------------------
 
     // VS 단계에 상수 버퍼 연결 (0번 슬롯)
@@ -337,16 +341,20 @@ void Render() {
     UINT stride = sizeof(SimpleVertex); // 정점 하나가 몇 바이트인지
     UINT offset = 0;                    // 버퍼 시작부터 몇 바이트 띄우고 읽을지
     g_pImmediateContext->IASetVertexBuffers(0, 1, g_pVertexBuffer.GetAddressOf(), &stride, &offset);
-
+    
+    // 인덱스 버퍼 설정
+    g_pImmediateContext->IASetIndexBuffer(g_pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+    
     // B. 도형의 위상(Topology) 설정
     // "점 3개마다 끊어서 삼각형 하나로 인식해라" (Triangle List)
     g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    // C. 그리기 명령 (GPU야 일해라!)
-    // Draw(정점 개수, 시작 인덱스)
-    g_pImmediateContext->Draw(3, 0);
+    // 5. 그리기 명령 (GPU야 일해라!)
+    // 기존 Draw(정점 개수, 시작 인덱스) g_pImmediateContext->Draw(3, 0);
+    // DrawIndexed(인덱스 개수, 시작 인덱스, 시작 정점)
+    g_pImmediateContext->DrawIndexed(36, 0, 0);
 
-    // D. 보여주기 (Swap Buffer)
+    // 6. 보여주기 (Swap Buffer)
     // 백 버퍼와 프론트 버퍼 교체
     g_pSwapChain->Present(0, 0); // 첫 번째 인자: 1이면 VSync 켜기, 0이면 끄기
 }
