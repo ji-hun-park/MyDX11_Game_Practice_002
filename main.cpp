@@ -39,6 +39,9 @@ ComPtr<ID3D11Texture2D> g_pDepthStencilBuffer;      // 깊이 버퍼 텍스처
 ComPtr<ID3D11DepthStencilView> g_pDepthStencilView; // 깊이 버퍼 뷰
 ComPtr<ID3D11Buffer> g_pIndexBuffer;                // 인덱스 버퍼
 
+// 래스터라이저 상태 객체 (설정 저장소)
+ComPtr<ID3D11RasterizerState> g_pRasterizerState;
+
 // C++용 정점 구조체
 struct SimpleVertex
 {
