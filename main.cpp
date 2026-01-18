@@ -178,7 +178,7 @@ HRESULT InitD3D(HWND hWnd) {
 
     // I. 텍스처 로드 (DirectXTK 사용)
     // L"texture.jpg" 파일이 프로젝트 폴더(소스파일 있는 곳)에 있어야 합니다.
-    hr = CreateWICTextureFromFile(g_pd3dDevice.Get(), L"texture.jpg", nullptr, g_pTextureRV.GetAddressOf());
+    hr = CreateWICTextureFromFile(g_pd3dDevice.Get(), L"texture.png", nullptr, g_pTextureRV.GetAddressOf());
     if (FAILED(hr)) return hr;
 
     // II. 샘플러 상태 생성
@@ -457,6 +457,8 @@ void Render() {
 
 // 메인 진입점
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
+	CoInitialize(nullptr); // COM 라이브러리 초기화 (DirectXTK용)
+    
     g_hInst = hInstance;
 
     // 1. 윈도우 클래스 등록
@@ -497,6 +499,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             Render();
         }
     }
+
+	CoUninitialize(); // COM 라이브러리 종료
 
     return (int)msg.wParam;
 }
