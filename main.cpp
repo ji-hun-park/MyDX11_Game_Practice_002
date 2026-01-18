@@ -43,7 +43,8 @@ ComPtr<ID3D11Buffer> g_pIndexBuffer;                // 인덱스 버퍼
 struct SimpleVertex
 {
     XMFLOAT3 Pos;    // x, y, z (12 bytes) - HLSL의 float4 Pos에 매핑됨 (w는 자동 1.0)
-    XMFLOAT4 Color;  // r, g, b, a (16 bytes)
+	XMFLOAT3 Normal; // Color 대신 Normal 사용 (12 bytes)
+    // 기존 XMFLOAT4 Color;  // r, g, b, a (16 bytes)
 };
 
 // HLSL의 cbuffer와 바이트 크기가 맞아야 함
@@ -52,6 +53,8 @@ struct ConstantBuffer
     XMMATRIX mWorld;
     XMMATRIX mView;
     XMMATRIX mProjection;
+	XMFLOAT4 vLightDir;   // 광원 방향 벡터
+	XMFLOAT4 vLightColor; // 광원 색상
 };
 
 // 윈도우 프로시저 (이벤트 처리기)
