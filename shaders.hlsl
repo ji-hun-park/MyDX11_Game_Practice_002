@@ -12,6 +12,10 @@ cbuffer ConstantBuffer : register(b0)
     float4 vLightColor; // 빛의 색상 (r, g, b, a)
 }
 
+// A. 텍스처와 샘플러 정의
+Texture2D txDiffuse : register(t0); // t0 슬롯: 텍스처
+SamplerState samLinear : register(s0); // s0 슬롯: 샘플러
+
 // 1. 입력 데이터 구조체 (C++에서 보낼 데이터와 모양이 같아야 함)
 struct VS_INPUT
 {
