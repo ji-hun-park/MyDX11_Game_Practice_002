@@ -355,6 +355,14 @@ void Render() {
     cb.mView = XMMatrixTranspose(g_View);
     cb.mProjection = XMMatrixTranspose(g_Projection);
 
+    // 조명 설정 (Directional Light)
+    // 빛의 방향: (0, 0, 1) -> 뒤에서 앞으로 쏘는 빛 (또는 대각선으로)
+    // 대각선 위에서 꽂히는 빛: (1, -1, 1) 같은 느낌
+    cb.vLightDir = XMFLOAT4(0.5f, -1.0f, 1.0f, 0.0f); // 빛이 아래로(-y) 꽂힘
+
+    // 빛의 색상: 옅은 노란색 빛
+    cb.vLightColor = XMFLOAT4(1.0f, 0.9f, 0.8f, 1.0f);
+
     // 컨텍스트를 이용해 GPU 메모리 갱신
     g_pImmediateContext->UpdateSubresource(g_pConstantBuffer.Get(), 0, nullptr, &cb, 0, 0);
 
