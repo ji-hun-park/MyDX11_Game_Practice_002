@@ -439,6 +439,12 @@ void Render() {
     // "점 3개마다 끊어서 삼각형 하나로 인식해라" (Triangle List)
     g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+    // 텍스처 자원 연결 (t0 슬롯)
+    g_pImmediateContext->PSSetShaderResources(0, 1, g_pTextureRV.GetAddressOf());
+
+    // 샘플러 연결 (s0 슬롯)
+    g_pImmediateContext->PSSetSamplers(0, 1, g_pSamplerLinear.GetAddressOf());
+
     // 5. 그리기 명령 (GPU야 일해라!)
     // 기존 Draw(정점 개수, 시작 인덱스) g_pImmediateContext->Draw(3, 0);
     // DrawIndexed(인덱스 개수, 시작 인덱스, 시작 정점)
