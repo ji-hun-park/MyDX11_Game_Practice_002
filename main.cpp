@@ -176,9 +176,6 @@ HRESULT InitD3D(HWND hWnd) {
     hr = g_pd3dDevice->CreateRasterizerState(&wfdesc, g_pRasterizerState.GetAddressOf());
     if (FAILED(hr)) return hr;
 
-    // 만든 상태를 파이프라인에 적용
-    g_pImmediateContext->RSSetState(g_pRasterizerState.Get());
-
     // I. 텍스처 로드 (DirectXTK 사용)
     // L"texture.jpg" 파일이 프로젝트 폴더(소스파일 있는 곳)에 있어야 합니다.
     hr = CreateWICTextureFromFile(g_pd3dDevice.Get(), L"texture.jpg", nullptr, g_pTextureRV.GetAddressOf());
@@ -196,6 +193,9 @@ HRESULT InitD3D(HWND hWnd) {
 
     hr = g_pd3dDevice->CreateSamplerState(&sampDesc, g_pSamplerLinear.GetAddressOf());
     if (FAILED(hr)) return hr;
+
+    // 만든 상태를 파이프라인에 적용
+    g_pImmediateContext->RSSetState(g_pRasterizerState.Get());
 
     return S_OK;
 }
