@@ -388,6 +388,7 @@ void Render() {
 
     // VS 단계에 상수 버퍼 연결 (0번 슬롯)
     g_pImmediateContext->VSSetConstantBuffers(0, 1, g_pConstantBuffer.GetAddressOf());
+    g_pImmediateContext->PSSetConstantBuffers(0, 1, g_pConstantBuffer.GetAddressOf());
 
     // 셰이더 장착
     g_pImmediateContext->VSSetShader(g_pVertexShader.Get(), nullptr, 0);
