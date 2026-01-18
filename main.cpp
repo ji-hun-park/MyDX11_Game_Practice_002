@@ -218,6 +218,9 @@ HRESULT InitPipeline() {
 		// COLOR -> NORMAL로 변경 (오프셋 12 유지)
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 
+        // UV 추가 (offset: 12 + 12 = 24)
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
         // "COLOR": HLSL의 시맨틱 이름
         // 12: 오프셋 (float3가 4byte * 3 = 12byte니까 그 다음부터 시작)
         // { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
