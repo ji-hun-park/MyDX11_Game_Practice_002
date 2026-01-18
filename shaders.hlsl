@@ -84,5 +84,7 @@ float4 PS(PS_INPUT input) : SV_Target
     
     // 4. 최종 색상 = 조명 밝기 * 빛의 색상
     // (물체 고유색이 있다면 여기서 곱해줍니다. 지금은 흰색 물체라 가정)
-    return diffuseFactor * vLightColor;
+    // 기존: return diffuseFactor * vLightColor;
+    // 주변광(Ambient) 추가
+    return (diffuseFactor * vLightColor) + float4(0.1f, 0.1f, 0.1f, 1.0f);
 }
