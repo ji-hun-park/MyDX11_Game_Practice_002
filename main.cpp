@@ -211,29 +211,51 @@ HRESULT InitPipeline() {
     hr = g_pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, g_pPixelShader.GetAddressOf());
     if (FAILED(hr)) return hr;
 
-    // 1. 버텍스 버퍼, 삼각형을 이룰 점 3개 정의 (NDC 좌표계: 화면 중앙 0,0 / 우측상단 1,1)
-    // 중요: 시계 방향(Clockwise) 순서로 정의해야 앞면으로 인식되어 그려집니다!
+    // 1. 정점 데이터 (8개)
     SimpleVertex vertices[] =
     {
-        // 위치(x, y, z)                // 색상(r, g, b, a)
-        { XMFLOAT3(0.0f,  0.5f, 0.5f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 위쪽 (빨강)
-        { XMFLOAT3(0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 우측 하단 (초록)
-        { XMFLOAT3(-0.5f, -0.5f, 0.5f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 좌측 하단 (파랑)
+        { XMFLOAT3(-1.0f,  1.0f, -1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 0: 좌상단 앞 (파랑)
+        { XMFLOAT3(1.0f,  1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },  // 1: 우상단 앞 (초록)
+        { XMFLOAT3(1.0f,  1.0f,  1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) },  // 2: 우상단 뒤 (청록)
+        { XMFLOAT3(-1.0f,  1.0f,  1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 3: 좌상단 뒤 (빨강)
+        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) }, // 4: 좌하단 앞 (보라)
+        { XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },  // 5: 우하단 앞 (노랑)
+        { XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },  // 6: 우하단 뒤 (흰색)
+        { XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) }, // 7: 좌하단 뒤 (검정)
     };
 
-    // 2. 버퍼 설정 구조체 (설계도)
+    // 버텍스 버퍼 생성 (기존 코드와 동일하지만 크기가 다름)
     D3D11_BUFFER_DESC bd = { 0 };
-    bd.Usage = D3D11_USAGE_DEFAULT;             // GPU가 읽고 쓰기 좋게 배치 (CPU 접근 불가)
-    bd.ByteWidth = sizeof(SimpleVertex) * 3;    // 버퍼의 총 바이트 크기
-    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;    // "이것은 버텍스 버퍼다"
-    bd.CPUAccessFlags = 0;                      // CPU가 내용 수정 안 함
+    bd.Usage = D3D11_USAGE_DEFAULT;
+    bd.ByteWidth = sizeof(SimpleVertex) * 8; // 점 8개
+    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    bd.CPUAccessFlags = 0;
 
-    // 3. 초기 데이터 설정 (내용물)
     D3D11_SUBRESOURCE_DATA InitData = { 0 };
-    InitData.pSysMem = vertices; // 위에서 만든 배열의 포인터
-
-    // 4. 버퍼 생성 (VRAM 할당 및 데이터 복사)
+    InitData.pSysMem = vertices;
     hr = g_pd3dDevice->CreateBuffer(&bd, &InitData, g_pVertexBuffer.GetAddressOf());
+    if (FAILED(hr)) return hr;
+
+    // 2. 인덱스 데이터 (삼각형 12개 * 3점 = 36개 숫자)
+    // 시계 방향(Clockwise)으로 점을 연결해야 앞면으로 인식됩니다.
+    WORD indices[] =
+    {
+        3,1,0, 2,1,3, // 윗면
+        0,5,4, 1,5,0, // 앞면
+        3,4,7, 0,4,3, // 왼쪽면
+        1,6,5, 2,6,1, // 오른쪽면
+        2,7,6, 3,7,2, // 뒷면
+        6,4,5, 7,4,6, // 아랫면
+    };
+
+    // 인덱스 버퍼 생성
+    bd.Usage = D3D11_USAGE_DEFAULT;
+    bd.ByteWidth = sizeof(WORD) * 36;        // 36개
+    bd.BindFlags = D3D11_BIND_INDEX_BUFFER; // "이것은 인덱스 버퍼다"
+    bd.CPUAccessFlags = 0;
+
+    InitData.pSysMem = indices;
+    hr = g_pd3dDevice->CreateBuffer(&bd, &InitData, g_pIndexBuffer.GetAddressOf());
     if (FAILED(hr)) return hr;
 
     // 1. 상수 버퍼 생성
