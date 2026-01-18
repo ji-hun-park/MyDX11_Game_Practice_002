@@ -46,12 +46,17 @@ ComPtr<ID3D11Buffer> g_pIndexBuffer;                // 인덱스 버퍼
 // 래스터라이저 상태 객체 (설정 저장소)
 ComPtr<ID3D11RasterizerState> g_pRasterizerState;
 
+// 텍스처 관련 전역 변수
+ComPtr<ID3D11ShaderResourceView> g_pTextureRV; // 텍스처 뷰 (이미지)
+ComPtr<ID3D11SamplerState> g_pSamplerLinear;   // 샘플러 상태
+
 // C++용 정점 구조체
 struct SimpleVertex
 {
     XMFLOAT3 Pos;    // x, y, z (12 bytes) - HLSL의 float4 Pos에 매핑됨 (w는 자동 1.0)
 	XMFLOAT3 Normal; // Color 대신 Normal 사용 (12 bytes)
     // 기존 XMFLOAT4 Color;  // r, g, b, a (16 bytes)
+	XMFLOAT2 Tex;    // u, v (8 bytes)
 };
 
 // HLSL의 cbuffer와 바이트 크기가 맞아야 함
