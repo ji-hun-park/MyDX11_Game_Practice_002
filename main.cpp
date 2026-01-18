@@ -34,6 +34,10 @@ XMMATRIX g_World;
 XMMATRIX g_View;
 XMMATRIX g_Projection;
 
+// 각 픽셀의 깊이를 기록할 깊이 버퍼 관련 전역 변수
+ComPtr<ID3D11Texture2D> g_pDepthStencilBuffer;      // 깊이 버퍼 텍스처
+ComPtr<ID3D11DepthStencilView> g_pDepthStencilView; // 깊이 버퍼 뷰
+
 // C++용 정점 구조체
 struct SimpleVertex
 {
