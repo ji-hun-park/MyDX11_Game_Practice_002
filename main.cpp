@@ -1,6 +1,10 @@
 #include <windows.h>
 #include <wrl/client.h> // ComPtr용
 
+// 텍스처 로더 (.png, .jpg 등)
+// 참고: .dds 파일을 쓴다면 DDSTextureLoader.h
+#include <WICTextureLoader.h> 
+
 // DirectX 11 관련 헤더
 #include <d3d11.h>
 #include <d3dcompiler.h> // 셰이더 컴파일용
